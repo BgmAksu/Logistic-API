@@ -1,0 +1,7 @@
+# Keep the container context lean
+.venv
+__pycache__
+*.pyc
+.env
+.git
+.gitignore
