@@ -1,5 +1,13 @@
 .venv/
 .vs/
+.env
+
+# Python artifacts
 __pycache__/
 *.pyc
-.env
+*.pyo
+
+
+# Alembic caches
+alembic/__pycache__/
+alembic/versions/__pycache__/
