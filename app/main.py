@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from .settings import settings
 
 # Routers
-from .routers import shipments, parcels, addresses, tracking, analytics
+from .routers import shipments, parcels, addresses, tracking, analytics, geo
 
 #print(f"[BOOT] Using APP_NAME={settings.APP_NAME!r}, APP_ENV={settings.APP_ENV!r}, DEBUG={settings.APP_DEBUG!r}")
 
@@ -18,3 +18,4 @@ app.include_router(shipments.router)
 app.include_router(parcels.router)
 app.include_router(tracking.router)
 app.include_router(analytics.router)
+app.include_router(geo.router)

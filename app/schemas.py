@@ -3,7 +3,7 @@
 from __future__ import annotations
 from typing import Optional
 from datetime import date, datetime
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ConfigDict
 
 
 # ---------- Address ----------
@@ -19,8 +19,7 @@ class AddressIn(BaseModel):
 
 class AddressOut(AddressIn):
     id: int
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 # ---------- Shipment ----------
@@ -41,8 +40,7 @@ class ShipmentOut(BaseModel):
     delivered_at: Optional[datetime] = None
     created_at: datetime
     updated_at: Optional[datetime] = None
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 # ---------- Parcel ----------
@@ -58,8 +56,7 @@ class ParcelOut(BaseModel):
     barcode: str
     weight_kg: Optional[float] = None
     volume_dm3: Optional[float] = None
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 # ---------- Tracking ----------
@@ -74,5 +71,4 @@ class TrackingEventIn(BaseModel):
 
 class TrackingEventOut(TrackingEventIn):
     id: int
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)

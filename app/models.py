@@ -15,6 +15,8 @@ from sqlalchemy import (
 )
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
+from geoalchemy2 import Geography
+
 from .db import Base
 
 
@@ -32,6 +34,11 @@ class Address(Base):
     country_code: Mapped[str] = mapped_column(String(2))
     lat: Mapped[Optional[float]] = mapped_column(Double)
     lon: Mapped[Optional[float]] = mapped_column(Double)
+
+     # Geodesic point; use geography for meter-based distances on Earth
+    geom: Mapped[Optional[object]] = mapped_column(
+        Geography(geometry_type="POINT", srid=4326), nullable=True
+    )
 
 
 class Depot(Base):
