@@ -5,6 +5,7 @@ from typing import Optional
 from datetime import date, datetime
 from pydantic import BaseModel, Field
 
+
 # ---------- Address ----------
 class AddressIn(BaseModel):
     name: Optional[str] = None
@@ -57,5 +58,21 @@ class ParcelOut(BaseModel):
     barcode: str
     weight_kg: Optional[float] = None
     volume_dm3: Optional[float] = None
+    class Config:
+        from_attributes = True
+
+
+# ---------- Tracking ----------
+class TrackingEventIn(BaseModel):
+    parcel_id: int
+    code: str               # e.g., COLLECTED, IN_DEPOT, OUT_FOR_DELIVERY, DELIVERED
+    description: Optional[str] = None
+    event_time: Optional[datetime] = None
+    lat: Optional[float] = None
+    lon: Optional[float] = None
+    location_name: Optional[str] = None
+
+class TrackingEventOut(TrackingEventIn):
+    id: int
     class Config:
         from_attributes = True
