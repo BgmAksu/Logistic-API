@@ -9,6 +9,8 @@ services:
       - ./:/app
     depends_on:
       - db
+    environment:
+      - PYTHONPATH=/app
 
   db:
     image: postgis/postgis:16-3.4

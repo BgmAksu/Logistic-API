@@ -2,7 +2,7 @@
 
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
-from sqlalchemy import select, func
+from sqlalchemy import select, func, text
 from ..deps import get_db
 from .. import models
 
@@ -44,14 +44,25 @@ def distance(
 
 @router.get("/route-length/{route_id}")
 def route_length(route_id: int, db: Session = Depends(get_db)):
-    # Sum pairwise distances between consecutive stops (ordered by sequence)
-    from sqlalchemy import over
-    lag_geom = func.lag(models.Address.geom).over(order_by=models.Stop.sequence)
-    stmt = (
-        select(func.sum(func.ST_Distance(models.Address.geom, lag_geom)))
-        .select_from(models.Stop)
-        .join(models.Address, models.Stop.address_id == models.Address.id)
-        .where(models.Stop.route_id == route_id, models.Address.geom.is_not(None))
-    )
-    total = db.scalar(stmt) or 0.0
+    # Compute pairwise distances between consecutive stops, then sum in the outer query.
+    stmt = text("""
+        WITH ordered AS (
+            SELECT s.sequence, a.geom
+            FROM stops s
+            JOIN addresses a ON a.id = s.address_id
+            WHERE s.route_id = :route_id
+              AND a.geom IS NOT NULL
+            ORDER BY s.sequence
+        ),
+        pairs AS (
+            SELECT sequence,
+                   geom,
+                   LAG(geom) OVER (ORDER BY sequence) AS prev_geom
+            FROM ordered
+        )
+        SELECT COALESCE(SUM(ST_Distance(geom, prev_geom)), 0) AS total_m
+        FROM pairs
+        WHERE prev_geom IS NOT NULL
+    """)
+    total = db.scalar(stmt, {"route_id": route_id}) or 0.0
     return {"route_id": route_id, "meters": float(total)}

@@ -2,7 +2,7 @@
 
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from sqlalchemy import select
+from sqlalchemy import select, text
 from .. import models, schemas
 from ..deps import get_db
 
@@ -14,6 +14,12 @@ def create_address(payload: schemas.AddressIn, db: Session = Depends(get_db)):
     db.add(obj)
     db.commit()
     db.refresh(obj)
+    if obj.lat is not None and obj.lon is not None:
+        db.execute(
+            text("UPDATE addresses SET geom = ST_SetSRID(ST_MakePoint(:lon, :lat), 4326) WHERE id = :id"),
+            {"lon": obj.lon, "lat": obj.lat, "id": obj.id},
+        )
+        db.commit()
     return obj
 
 @router.get("", response_model=list[schemas.AddressOut])
