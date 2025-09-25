@@ -1,21 +1,23 @@
 # Pydantic models used for request/response validation.
 
 from __future__ import annotations
-from typing import Optional
+
 from datetime import date, datetime
-from pydantic import BaseModel, Field, ConfigDict
+
+from pydantic import BaseModel, ConfigDict, Field
 
 
 # ---------- Address ----------
 class AddressIn(BaseModel):
-    name: Optional[str] = None
+    name: str | None = None
     line1: str
-    line2: Optional[str] = None
+    line2: str | None = None
     city: str
     zip_code: str
     country_code: str = Field(min_length=2, max_length=2)
-    lat: Optional[float] = None
-    lon: Optional[float] = None
+    lat: float | None = None
+    lon: float | None = None
+
 
 class AddressOut(AddressIn):
     id: int
@@ -29,17 +31,18 @@ class ShipmentIn(BaseModel):
     status: str = "CREATED"
     sender_address_id: int
     recipient_address_id: int
-    planned_delivery_date: Optional[date] = None
+    planned_delivery_date: date | None = None
+
 
 class ShipmentOut(BaseModel):
     id: int
     reference: str
     service_level: str
     status: str
-    planned_delivery_date: Optional[date] = None
-    delivered_at: Optional[datetime] = None
+    planned_delivery_date: date | None = None
+    delivered_at: datetime | None = None
     created_at: datetime
-    updated_at: Optional[datetime] = None
+    updated_at: datetime | None = None
     model_config = ConfigDict(from_attributes=True)
 
 
@@ -47,27 +50,29 @@ class ShipmentOut(BaseModel):
 class ParcelIn(BaseModel):
     shipment_id: int
     barcode: str
-    weight_kg: Optional[float] = None
-    volume_dm3: Optional[float] = None
+    weight_kg: float | None = None
+    volume_dm3: float | None = None
+
 
 class ParcelOut(BaseModel):
     id: int
     shipment_id: int
     barcode: str
-    weight_kg: Optional[float] = None
-    volume_dm3: Optional[float] = None
+    weight_kg: float | None = None
+    volume_dm3: float | None = None
     model_config = ConfigDict(from_attributes=True)
 
 
 # ---------- Tracking ----------
 class TrackingEventIn(BaseModel):
     parcel_id: int
-    code: str               # e.g., COLLECTED, IN_DEPOT, OUT_FOR_DELIVERY, DELIVERED
-    description: Optional[str] = None
-    event_time: Optional[datetime] = None
-    lat: Optional[float] = None
-    lon: Optional[float] = None
-    location_name: Optional[str] = None
+    code: str  # e.g., COLLECTED, IN_DEPOT, OUT_FOR_DELIVERY, DELIVERED
+    description: str | None = None
+    event_time: datetime | None = None
+    lat: float | None = None
+    lon: float | None = None
+    location_name: str | None = None
+
 
 class TrackingEventOut(TrackingEventIn):
     id: int

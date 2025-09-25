@@ -1,5 +1,6 @@
 from pydantic_settings import BaseSettings
 
+
 class Settings(BaseSettings):
     APP_NAME: str = "Logistics Data-Driven API"
     APP_ENV: str = "local"
@@ -27,5 +28,6 @@ class Settings(BaseSettings):
                 f"@{self.POSTGRES_HOST}:{self.POSTGRES_PORT}/{self.POSTGRES_DB}"
             )
         raise ValueError("Unsupported DB_DRIVER")
+
 
 settings = Settings()

@@ -1,13 +1,16 @@
 # Basic shipment CRUD: create, list, get.
 
 from datetime import datetime
+
 from fastapi import APIRouter, Depends, HTTPException, Query
-from sqlalchemy.orm import Session
 from sqlalchemy import select
+from sqlalchemy.orm import Session
+
 from .. import models, schemas
 from ..deps import get_db
 
 router = APIRouter(prefix="/api/shipments", tags=["shipments"])
+
 
 @router.post("", response_model=schemas.ShipmentOut, status_code=201)
 def create_shipment(payload: schemas.ShipmentIn, db: Session = Depends(get_db)):
@@ -32,6 +35,7 @@ def create_shipment(payload: schemas.ShipmentIn, db: Session = Depends(get_db)):
     db.refresh(obj)
     return obj
 
+
 @router.get("", response_model=list[schemas.ShipmentOut])
 def list_shipments(
     status: str | None = Query(None, description="Filter by status"),
@@ -44,6 +48,7 @@ def list_shipments(
     if service_level:
         stmt = stmt.where(models.Shipment.service_level == service_level)
     return db.execute(stmt).scalars().all()
+
 
 @router.get("/{shipment_id}", response_model=schemas.ShipmentOut)
 def get_shipment(shipment_id: int, db: Session = Depends(get_db)):

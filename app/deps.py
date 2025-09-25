@@ -1,7 +1,9 @@
 # Provides a request-scoped SQLAlchemy session for FastAPI routers.
 
-from typing import Generator
+from collections.abc import Generator
+
 from .db import SessionLocal
+
 
 def get_db() -> Generator:
     db = SessionLocal()

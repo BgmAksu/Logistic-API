@@ -1,14 +1,12 @@
 from logging.config import fileConfig
 
-from sqlalchemy import engine_from_config
-from sqlalchemy import pool
+from sqlalchemy import engine_from_config, pool
 
 from alembic import context
 
 # Import app metadata
 from app.db import Base
 from app.settings import settings
-import app.models  # ensure models are imported so Base.metadata has tables
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
@@ -29,21 +27,50 @@ target_metadata = Base.metadata
 # tables we never want Alembic to touch
 SKIP_TABLES = {
     # common PostGIS / tiger / topology tables (public schema)
-    "spatial_ref_sys", "geography_columns", "geometry_columns",
-    "raster_columns", "raster_overviews",
-    "geocode_settings", "geocode_settings_default",
-    "loader_lookuptables", "loader_platform", "loader_variables",
+    "spatial_ref_sys",
+    "geography_columns",
+    "geometry_columns",
+    "raster_columns",
+    "raster_overviews",
+    "geocode_settings",
+    "geocode_settings_default",
+    "loader_lookuptables",
+    "loader_platform",
+    "loader_variables",
     # tiger / tiger_data sample tables
-    "addr", "addrfeat", "edges", "faces", "featnames",
-    "place", "place_lookup", "county", "county_lookup", "state",
-    "zcta5", "cousub", "countysub_lookup", "direction_lookup",
-    "secondary_unit_lookup", "street_type_lookup",
-    "tabblock", "tabblock20", "tract", "zip_lookup",
-    "zip_lookup_all", "zip_lookup_base", "zip_state", "zip_state_loc",
-    "pagc_gaz", "pagc_lex", "pagc_rules", "layer", "topology",
+    "addr",
+    "addrfeat",
+    "edges",
+    "faces",
+    "featnames",
+    "place",
+    "place_lookup",
+    "county",
+    "county_lookup",
+    "state",
+    "zcta5",
+    "cousub",
+    "countysub_lookup",
+    "direction_lookup",
+    "secondary_unit_lookup",
+    "street_type_lookup",
+    "tabblock",
+    "tabblock20",
+    "tract",
+    "zip_lookup",
+    "zip_lookup_all",
+    "zip_lookup_base",
+    "zip_state",
+    "zip_state_loc",
+    "pagc_gaz",
+    "pagc_lex",
+    "pagc_rules",
+    "layer",
+    "topology",
 }
 
 SKIP_SCHEMAS = {"tiger", "tiger_data", "topology"}
+
 
 def include_object(object, name, type_, reflected, compare_to):
     """
@@ -64,6 +91,7 @@ def include_object(object, name, type_, reflected, compare_to):
             if schema in SKIP_SCHEMAS or tbl.name in SKIP_TABLES:
                 return False
     return True
+
 
 def run_migrations_offline() -> None:
     """Run migrations in 'offline' mode.
@@ -105,8 +133,8 @@ def run_migrations_online() -> None:
 
     with connectable.connect() as connection:
         context.configure(
-            connection=connection, 
-            target_metadata=target_metadata, 
+            connection=connection,
+            target_metadata=target_metadata,
             compare_type=True,
             include_object=include_object,
         )

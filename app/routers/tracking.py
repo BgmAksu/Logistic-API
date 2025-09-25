@@ -1,13 +1,16 @@
 # Tracking events ingestion & listing.
 
 from datetime import datetime
+
 from fastapi import APIRouter, Depends, HTTPException, Query
-from sqlalchemy.orm import Session
 from sqlalchemy import select
-from ..deps import get_db
+from sqlalchemy.orm import Session
+
 from .. import models, schemas
+from ..deps import get_db
 
 router = APIRouter(prefix="/api/tracking-events", tags=["tracking"])
+
 
 @router.post("", response_model=schemas.TrackingEventOut, status_code=201)
 def create_event(payload: schemas.TrackingEventIn, db: Session = Depends(get_db)):
@@ -36,6 +39,7 @@ def create_event(payload: schemas.TrackingEventIn, db: Session = Depends(get_db)
     db.commit()
     db.refresh(ev)
     return ev
+
 
 @router.get("", response_model=list[schemas.TrackingEventOut])
 def list_events(
