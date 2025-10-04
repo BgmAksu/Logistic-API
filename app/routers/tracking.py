@@ -1,52 +1,25 @@
 # Tracking events ingestion & listing.
 
-from datetime import datetime
 
-from fastapi import APIRouter, Depends, HTTPException, Query
-from sqlalchemy import select
+from fastapi import APIRouter, Depends, HTTPException, Path
 from sqlalchemy.orm import Session
 
-from .. import models, schemas
+from .. import schemas
 from ..deps import get_db
+from ..services.tracking import TrackingService
 
 router = APIRouter(prefix="/api/tracking-events", tags=["tracking"])
+service = TrackingService()
 
 
 @router.post("", response_model=schemas.TrackingEventOut, status_code=201)
 def create_event(payload: schemas.TrackingEventIn, db: Session = Depends(get_db)):
-    # Ensure parcel exists
-    parcel = db.get(models.Parcel, payload.parcel_id)
-    if not parcel:
-        raise HTTPException(status_code=404, detail="Parcel not found")
-
-    ev = models.TrackingEvent(
-        parcel_id=payload.parcel_id,
-        code=payload.code,
-        description=payload.description,
-        event_time=payload.event_time or datetime.utcnow(),
-        lat=payload.lat,
-        lon=payload.lon,
-        location_name=payload.location_name,
-    )
-    db.add(ev)
-
-    # If the event is DELIVERED, mark shipment as delivered
-    if payload.code.upper() == "DELIVERED":
-        shp = parcel.shipment
-        shp.status = "DELIVERED"
-        shp.delivered_at = ev.event_time
-
-    db.commit()
-    db.refresh(ev)
-    return ev
+    try:
+        return service.create(db, payload)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e)) from e
 
 
-@router.get("", response_model=list[schemas.TrackingEventOut])
-def list_events(
-    parcel_id: int | None = Query(default=None, description="Filter by parcel_id"),
-    db: Session = Depends(get_db),
-):
-    stmt = select(models.TrackingEvent)
-    if parcel_id is not None:
-        stmt = stmt.where(models.TrackingEvent.parcel_id == parcel_id)
-    return db.execute(stmt).scalars().all()
+@router.get("/parcel/{parcel_id}", response_model=list[schemas.TrackingEventOut])
+def list_events(parcel_id: int = Path(..., ge=1), db: Session = Depends(get_db)):
+    return service.list_for_parcel(db, parcel_id)
