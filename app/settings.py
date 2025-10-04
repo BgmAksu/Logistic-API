@@ -5,6 +5,7 @@ class Settings(BaseSettings):
     APP_NAME: str = "Logistics Data-Driven API"
     APP_ENV: str = "local"
     APP_DEBUG: bool = True
+    APP_DESCRIPTION: str = "Logistics API for data-driven ops"
 
     # Database driver: "postgres" (using Alembic and psycopg2)
     DB_DRIVER: str = "postgres"
