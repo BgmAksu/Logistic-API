@@ -47,6 +47,7 @@ uvicorn==0.35.0
 watchfiles==1.1.0
 websockets==15.0.1
 prometheus-fastapi-instrumentator==7.0.0
+slowapi==0.1.9
 
 # text
 pre-commit==3.8.0

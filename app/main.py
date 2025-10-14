@@ -1,8 +1,10 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.openapi.docs import get_swagger_ui_html
 from fastapi.openapi.utils import get_openapi
 from prometheus_fastapi_instrumentator import Instrumentator
 
+from .limits import register_rate_limit
 from .logging_setup import configure_logging
 
 # Routers
@@ -22,6 +24,18 @@ app = FastAPI(
 
 configure_logging()  # JSON logs
 Instrumentator().instrument(app).expose(app, endpoint="/metrics")
+
+# CORS (adjust origins as needed)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:5173", "http://localhost:3000"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# Rate limiter registration (no circular import)
+register_rate_limit(app)
 
 
 def custom_openapi():

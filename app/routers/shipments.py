@@ -1,11 +1,12 @@
 # Basic shipment CRUD: create, list, get.
 
 
-from fastapi import APIRouter, Depends, HTTPException, Path, Query
+from fastapi import APIRouter, Depends, HTTPException, Path, Query, Request
 from sqlalchemy.orm import Session
 
 from .. import models, schemas
 from ..deps import get_db
+from ..limits import limiter
 from ..services.shipments import ShipmentsService
 
 router = APIRouter(prefix="/api/shipments", tags=["shipments"])
@@ -31,7 +32,9 @@ def create_shipment(payload: schemas.ShipmentIn, db: Session = Depends(get_db)):
 
 
 @router.get("", response_model=list[schemas.ShipmentOut])
+@limiter.limit("2/minute")  # demo throttle
 def list_shipments(
+    request: Request,
     status: str | None = Query(None, description="Filter by shipment status"),
     page: dict = Depends(pagination),
     db: Session = Depends(get_db),
