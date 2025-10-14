@@ -3,6 +3,7 @@ from dataclasses import dataclass
 from sqlalchemy.orm import Session
 
 from .. import models
+from ..errors import DomainValidationError
 from ..repositories.parcels import ParcelRepository, SqlAlchemyParcelRepository
 from ..schemas import ParcelIn
 
@@ -14,7 +15,7 @@ class ParcelsService:
     def create(self, db: Session, payload: ParcelIn) -> models.Parcel:
         # Domain guard: shipment must exist
         if not db.get(models.Shipment, payload.shipment_id):
-            raise ValueError("shipment_id does not exist")
+            raise DomainValidationError("shipment_id does not exist")
         obj = models.Parcel(**payload.model_dump())
         return self.repo.create(db, obj)
 

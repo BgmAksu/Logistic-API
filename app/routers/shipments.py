@@ -4,7 +4,7 @@
 from fastapi import APIRouter, Depends, HTTPException, Path, Query, Request
 from sqlalchemy.orm import Session
 
-from .. import models, schemas
+from .. import schemas
 from ..deps import get_db
 from ..limits import limiter
 from ..services.shipments import ShipmentsService
@@ -23,11 +23,6 @@ def pagination(
 
 @router.post("", response_model=schemas.ShipmentOut, status_code=201)
 def create_shipment(payload: schemas.ShipmentIn, db: Session = Depends(get_db)):
-    # Lightweight FK existence checks to fail fast on bad input
-    if not db.get(models.Address, payload.sender_address_id):
-        raise HTTPException(status_code=400, detail="sender_address_id does not exist")
-    if not db.get(models.Address, payload.recipient_address_id):
-        raise HTTPException(status_code=400, detail="recipient_address_id does not exist")
     return service.create(db, payload)
 
 

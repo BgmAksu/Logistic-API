@@ -4,6 +4,7 @@ from datetime import datetime
 from sqlalchemy.orm import Session
 
 from .. import models
+from ..errors import NotFoundError
 from ..repositories.shipments import ShipmentRepository, SqlAlchemyShipmentRepository
 from ..schemas import ShipmentIn
 
@@ -15,7 +16,11 @@ class ShipmentsService:
     repo: ShipmentRepository = SqlAlchemyShipmentRepository()
 
     def create(self, db: Session, payload: ShipmentIn) -> models.Shipment:
-        # NOTE: Router will validate FK existence; service focuses on domain rules.
+        if not db.get(models.Address, payload.sender_address_id):
+            raise NotFoundError("address", payload.sender_address_id)
+        if not db.get(models.Address, payload.recipient_address_id):
+            raise NotFoundError("address", payload.recipient_address_id)
+
         obj = models.Shipment(
             reference=payload.reference,
             service_level=payload.service_level,

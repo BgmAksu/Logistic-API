@@ -21,10 +21,7 @@ def pagination(
 
 @router.post("", response_model=schemas.ParcelOut, status_code=201)
 def create_parcel(payload: schemas.ParcelIn, db: Session = Depends(get_db)):
-    try:
-        return service.create(db, payload)
-    except ValueError as err:
-        raise HTTPException(status_code=400, detail=str(err)) from err
+    return service.create(db, payload)
 
 
 @router.get("", response_model=list[schemas.ParcelOut])

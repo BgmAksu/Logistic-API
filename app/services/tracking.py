@@ -4,6 +4,7 @@ from datetime import datetime
 from sqlalchemy.orm import Session
 
 from .. import models
+from ..errors import DomainValidationError
 from ..repositories.tracking import SqlAlchemyTrackingRepository, TrackingRepository
 from ..schemas import TrackingEventIn
 
@@ -16,7 +17,7 @@ class TrackingService:
         # Guard: parcel must exist
         parcel = db.get(models.Parcel, payload.parcel_id)
         if not parcel:
-            raise ValueError("parcel_id does not exist")
+            raise DomainValidationError("parcel_id does not exist")
 
         evt = models.TrackingEvent(**payload.model_dump())
         evt = self.repo.create(db, evt)
