@@ -8,7 +8,7 @@ from .limits import register_rate_limit
 from .logging_setup import configure_logging
 
 # Routers
-from .routers import addresses, analytics, geo, parcels, shipments, tracking
+from .routers import addresses, analytics, geo, geo_optimize, parcels, shipments, tracking
 from .settings import settings
 
 # Keep using settings for title; read optional version/description safely
@@ -78,3 +78,4 @@ app.include_router(parcels.router)
 app.include_router(tracking.router)
 app.include_router(analytics.router)
 app.include_router(geo.router)
+app.include_router(geo_optimize.router)
