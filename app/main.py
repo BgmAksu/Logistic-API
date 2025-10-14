@@ -31,12 +31,12 @@ app = FastAPI(
 async def app_error_handler(request: Request, exc: AppError):
     """Return RFC7807-like problem+json for domain errors."""
     problem = {
-        "type": f"https://example.com/problems/{exc.code}",
+        "type": f"https://example.com/problems/{exc.code.value}",
         "title": exc.title,
         "status": exc.status,
         "detail": exc.detail,
         "instance": str(request.url),
-        "code": str(exc.code),
+        "code": exc.code.value,
     }
     if exc.extra:
         problem["extra"] = exc.extra
