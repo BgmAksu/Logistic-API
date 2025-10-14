@@ -1,6 +1,9 @@
 from fastapi import FastAPI
 from fastapi.openapi.docs import get_swagger_ui_html
 from fastapi.openapi.utils import get_openapi
+from prometheus_fastapi_instrumentator import Instrumentator
+
+from .logging_setup import configure_logging
 
 # Routers
 from .routers import addresses, analytics, geo, parcels, shipments, tracking
@@ -16,6 +19,9 @@ app = FastAPI(
         "REST API for data-driven logistics: shipments, parcels, routes, geo & analytics.",
     ),
 )
+
+configure_logging()  # JSON logs
+Instrumentator().instrument(app).expose(app, endpoint="/metrics")
 
 
 def custom_openapi():
